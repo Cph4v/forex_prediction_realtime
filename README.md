@@ -94,8 +94,49 @@
 
 </details>
 
-![Forex Prediction Overview](/path/to/forex_prediction_1.png)
-*Real-Time Market Dashboard - Broader View*
+### Forex Price Prediction for USDJPY
 
-![Forex Prediction Zoomed](/path/to/forex_prediction_2.png)
-*Real-Time Market Dashboard - Detailed View*
+#### Overview of Predictions
+The first image provides a comprehensive view of the USDJPY forex pair, highlighting the predicted buy signals (marked in red) over several months. This visualization underscores the model's capability to identify potential buy opportunities in various market conditions, as seen by the dispersed red points throughout the graph.
+
+![Forex Prediction Overview](/forex_prediction_1.png)
+*Figure 1: Real-Time Market Dashboard - Broader View*
+
+#### Detailed View of Recent Predictions
+The second image zooms in on the last few weeks, offering a detailed perspective on recent predictions. The red points continue to indicate buy signals, providing insights into the model’s responsiveness to recent market shifts and its precision in pinpointing buy opportunities in a shorter timeframe.
+
+![Forex Prediction Zoomed](/forex_prediction_2.png)
+*Figure 2: Real-Time Market Dashboard - Detailed View*
+
+These images showcase the effectiveness of the predictive model in real-time forex trading, demonstrating its utility in both broad and detailed analyses. The ability to visualize these predictions helps in verifying the model's alignment with trading strategies and market dynamics.
+
+### Usage Instructions
+
+To effectively utilize this forex prediction system, follow the steps outlined below:
+
+#### Initial Setup
+1. **Configure API Access**:
+   - Locate the `.env` file in the root directory of the project.
+   - You will need to set your own `API_TOKEN` and `API_KEY` in the `.env` file. These are essential for accessing the data sources and services that the application depends on.
+
+2. **Install Dependencies**:
+   - Ensure that Python and pip are installed on your system.
+   - Open a terminal and navigate to the project directory.
+   - Run the following command to install all required dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+#### Running the Application
+1. **Execute the Main Script**:
+   - Once the setup is complete, you can start the application by running the `test.py` script. This script initializes the entire prediction system, processing data and generating predictions.
+   - Execute the script by running:
+     ```bash
+     python test.py
+     ```
+
+#### Additional Information
+- Ensure that all configurations in the `.env` and any other configuration files are correct and tailored to your specific requirements.
+- The system assumes a network connection is available for accessing remote APIs and data sources as defined in your configurations.
+
+By following these instructions, you should be able to successfully operate the forex prediction system and begin making informed trading decisions based on the model's predictions.
