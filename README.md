@@ -140,3 +140,9 @@ To effectively utilize this forex prediction system, follow the steps outlined b
 - The system assumes a network connection is available for accessing remote APIs and data sources as defined in your configurations.
 
 By following these instructions, you should be able to successfully operate the forex prediction system and begin making informed trading decisions based on the model's predictions.
+
+### License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.txt) file for details.
+
+
