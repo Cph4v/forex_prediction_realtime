@@ -14,24 +14,7 @@ def add_candle_features(
     org_columns = set(df.columns)
     org_columns.remove("_time")
     for tf in tf_list:
-        df = df.with_columns(
-            [
-                (
-                    (pl.col(f"M{tf}_CLOSE") - pl.col(f"M{tf}_OPEN"))
-                    / symbols_dict[symbol]["pip_size"]
-                ).alias(f"{fe_prefix}_M{tf}_OPEN"),
-                (
-                    (pl.col(f"M{tf}_HIGH") - pl.col(f"M{tf}_LOW"))
-                    / symbols_dict[symbol]["pip_size"]
-                ).alias(f"{fe_prefix}_M{tf}_LOW"),
-                (
-                    (pl.col(f"M{tf}_HIGH") - pl.col(f"M{tf}_CLOSE"))
-                    / symbols_dict[symbol]["pip_size"]
-                ).alias(f"{fe_prefix}_M{tf}_CLOSE"),
-            ]
-        )
-
-    df = df.drop(org_columns)
+        continue
 
     return df
 
@@ -41,21 +24,7 @@ def add_shifted_candle_features(
     org_columns = set(df.columns)
     org_columns.remove("_time")
     for sh in shift_sizes:
-        df = df.with_columns(
-            [
-                (pl.col(f"M{tf}_CLOSE_-{sh}") - pl.col(f"M{tf}_OPEN_-{sh}")).alias(
-                    f"{fe_prefix}_M{tf}_OPEN_-{sh}"
-                ),
-                (pl.col(f"M{tf}_HIGH_-{sh}") - pl.col(f"M{tf}_LOW_-{sh}")).alias(
-                    f"{fe_prefix}_M{tf}_LOW_-{sh}"
-                ),
-                (pl.col(f"M{tf}_HIGH_-{sh}") - pl.col(f"M{tf}_CLOSE_-{sh}")).alias(
-                    f"{fe_prefix}_M{tf}_CLOSE_-{sh}"
-                )
-            ]
-        )
-
-    df = df.drop(*org_columns)
+        continue
 
     return df
 
@@ -70,24 +39,7 @@ def history_basic_features(feature_config, logger=default_logger):
 
 
         for symbol in list(feature_config.keys()):
-            if fe_prefix not in list(feature_config[symbol].keys()):
-                continue
-            logger.info(f"- " * 30)
-            logger.info(f"--> {fe_prefix}, {symbol}:")
-          
-            tf_list = feature_config[symbol]["fe_cndl"]
-            file_name = features_folder_path + f"/{fe_prefix}_{symbol}.parquet"
-            df = pl.read_parquet(
-                f"{root_path}/data/realtime_candle/{symbol}_realtime_candle.parquet"
-            )
-               
-            df = df.sort("_time").drop("symbol")
-            df = add_candle_features(
-                df, symbol, tf_list=tf_list, fe_prefix=fe_prefix
-            )
-            df = df.with_columns(...)
-            df.write_parquet(file_name)
-            logger.info(f"--> fe_cndl {symbol} saved.")
+            continue
 
         # ----------------------------------
         fe_prefix = "fe_cndl_shift"
@@ -134,68 +86,6 @@ def history_basic_features(feature_config, logger=default_logger):
         logger.exception(f"--> error: {e}")
         raise ValueError("!!!")
 
-def history_fe_market_close(feature_config, logger=default_logger):
-    logger.info("- " * 25)
-    logger.info("--> start history_fe_market_close fumc:")
-    try:
-        fe_prefix = "fe_market_close"
-        features_folder_path = f"{root_path}/data/features/{fe_prefix}/"
-        Path(features_folder_path).mkdir(parents=True, exist_ok=True)
-
-        ##? in EST time zone
-        markets_trade_times = {...
-        }
-
-        for symbol in list(feature_config.keys()):
-            logger.info(f"-->{symbol}")
-            logger.info("= " * 40)
-
-            columns = ["_time", "close"]
-            df=pd.read_parquet(f"{root_path}/data/stage_one_data/{symbol}_stage_one.parquet",columns=columns)
-            df["_time"] = df["_time"].dt.tz_localize(None)
-            df.sort_values("_time", inplace=True)
-            df.reset_index(drop=True, inplace=True)
-            df["_time"] = df["_time"] - timedelta(hours=7)
-
-            for market in markets_trade_times:
-                fiter = (
-                    df["_time"].dt.hour == markets_trade_times[market]["hour"]
-                ) & (df["_time"].dt.minute == markets_trade_times[market]["minute"])
-
-
-                df["last_close_price"] = None
-                df.loc[fiter, "last_close_price"] = df.loc[fiter, "close"]
-
-                df["last_close_time"] = None
-                df.loc[fiter, "last_close_time"] = df.loc[fiter, "_time"]
-                with pd.option_context("future.no_silent_downcasting", True):
-                    df = df.ffill(inplace=False).infer_objects(copy=False)
-
-                
-                df[f"{fe_prefix}_{market}"] = (
-                    df["close"] - df["last_close_price"]
-                ) / symbols_dict[symbol]["pip_size"]
-                df[f"{fe_prefix}_{market}_time"] = (
-                    df["_time"] - df["last_close_time"]
-                ).dt.seconds // 60
-
-            ##? parquet save:
-            df.drop(
-                columns=["last_close_price", "close", "last_close_time"],
-                inplace=True,
-            )
-            df["_time"] = df["_time"] + timedelta(hours=7)
-            df.dropna(inplace=True)
-            df.reset_index(drop=True, inplace=True)
-            df["symbol"] = symbol
-            file_name = f"{features_folder_path}/{fe_prefix}_{symbol}.parquet"
-            df.to_parquet(file_name,index=False)
-
-        logger.info("--> history_fe_market_close run successfully.")
-    except Exception as e:
-        logger.exception("--> history_fe_market_close error.")
-        logger.exception(f"--> error: {e}")
-        raise ValueError("!!!")
 
 def history_fe_time(feature_config, logger=default_logger):
     logger.info("- " * 25)
